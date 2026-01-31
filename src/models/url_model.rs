@@ -9,10 +9,10 @@ struct ShortURL {
 }
 
 impl ShortURL{
-    fn short_url(item: ShortURL) -> Result(Self, Self::Error){
+    fn short_url(&self) -> Result(&self, &self::Error){
         
         Ok(Self {
-            short_url: item.short_url
+            short_url: self.short_url
         })
     }
 }
