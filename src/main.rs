@@ -1,17 +1,29 @@
-use mongodb::{Client, options::ClientOptions};
-use std::env;
-use mongodb::bson::doc;
+use axum::{Json,  Router, routing::get, response::{Response}};
+use crate::{models::url_model::{ShortURL, OriginalUrl}, services::db::data_structure};
+
+
+mod routes;
+mod services;
+mod models;
+
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>>{
+async fn main() {
+    dotenv::dotenv().ok();
+    let app = Router::new().route("/", get(get_shorturl));
 
-    let mongodb_uri = env::var("MONGODB_URI").expect("NO CONNECTION URL FOUND");
+    let address = "localhost:6650";
+    let listener = tokio::net::TcpListener::bind(address).await.unwrap();
 
-    let client_options = ClientOptions::parse(&mongodb_uri).await?;
+    axum::serve(listener, app).await.unwrap();
+}
 
-    let client = Client::with_options(client_options)?;
-
-    client.database("admin").run_command(doc!{"ping":1}).await?;
-    
-    Ok(println!("MongoDB connected"))
+async fn get_shorturl(db: Data<data_structure>,request: Json<OriginalUrl>) -> Response{
+    match db.Original_url(ShortURL::try_from(OriginalUrl{
+        og_url: request.og_url.clone()
+    }).expect("Error creating short url")
+).await{
+    Ok(shorturl) => Response::Ok().json(shorturl),
+    Err(err) => Response::InternalServerError().body(err.to_string())
+}
 }
