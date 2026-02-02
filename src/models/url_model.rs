@@ -1,12 +1,13 @@
-use serde::{Deserialization, Serialization};
+use serde::{Deserialize, Serialize};
+use std::error::Error;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ShortURL {
-    user_id: u32,
-    short_url: String,
+    // user_id: u32,
+    // short_url: String,
     og_url: String,
-    created_time: String,
-    expiry_time: String
+    // created_time: String,
+    // expiry_time: String
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -15,10 +16,10 @@ pub struct OriginalUrl {
 }
 
 impl ShortURL{
-    fn short_url(&self) -> Result<&Self, &self::Error>{
+    fn short_url(&self) -> Result<Self, Box<dyn std::error::Error>>{
         
-        Ok(&Self {
-            short_url: self.short_url
+        Ok(Self {
+            og_url: self.og_url.clone()
         })
     }
 }

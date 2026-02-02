@@ -1,30 +1,34 @@
+use axum::response::Response;
 use mongodb::{
     Client, Collection, bson::de::Error, options::ClientOptions, results::{DeleteResult, InsertOneResult, UpdateResult}
 };
 use std::env;
+use mongodb::bson::doc;
 
-pub struct data_structure {
-    short_url: Collection<short_url>,
+use crate::models::url_model::ShortURL;
+
+pub struct DataStructure {
+        og_url : Collection<ShortURL>,
 }
 
-impl data_structure {
-    async fn db_connection() -> Self {
+impl DataStructure {
+    async fn db_connection() -> Result<Client, mongodb::error::Error> {
         let uri = env::var("MONGODB_URI").expect("CONNECTION STRING NOT FOUND");
 
         let client_options = ClientOptions::parse(&uri).await?;
 
         let client = Client::with_options(client_options)?;
 
-        client.database("Keepitshort").run_command(doc! {ping:1}).await?;
+        client.database("SHORT_URL").run_command(doc! {"ping":1}).await?;
         println!("MongoDB Connected Successfully!");
 
-        Ok(())
+        Ok(client)
     }
 
-    async fn url_storage(&self, short_url: short_url) -> Result<InsertOneResult, Error> {
+    async fn url_storage(&self, og_url: ShortURL) -> Result<InsertOneResult, Error> {
         let result = self
-            .short_url
-            .insert_one(short_url)
+            .og_url
+            .insert_one(og_url)
             .await
             .ok()
             .expect("Error inserting a url");
