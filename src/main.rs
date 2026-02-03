@@ -1,25 +1,21 @@
 use axum::extract::State;
-use axum::{Json, Router, http::StatusCode, response::Response, routing::get};
-use mongodb::Client;
+use axum::{Json, Router, http::StatusCode, response::IntoResponse, routing::get};
 
+use crate::services::db::DataStructure;
 use crate::{
-    models::url_model::{OriginalUrl, ShortURL},
-    services::db::db_collection;
+    models::url_model::{OriginalUrl, ShortURL}
 };
 
 // mod routes;
 mod models;
 mod services;
 
-#[derive(Clone)]
-struct AppState{
-    mongo: 
-}
 
 #[tokio::main]
 async fn main() {
     dotenv::dotenv().ok();
-    let app = Router::new().route("/", get(get_shorturl)).with_state(app_state);
+    let mongo = DataStructure::new().await.expect("Failed to connect");
+    let app = Router::new().route("/url", get(get_shorturl)).with_state(mongo);
 
     let address = "localhost:6650";
     let listener = tokio::net::TcpListener::bind(address).await.unwrap();
@@ -27,13 +23,10 @@ async fn main() {
     axum::serve(listener, app).await.unwrap();
 }
 
-async fn get_shorturl(State(state): State<AppState>, request: Json<OriginalUrl>) -> Response {
-    let store = url_
-        .await
-    {
-        Ok(shorturl) => Json(shorturl).into_response(),
-        Err(err) => Response::builder()
-            .status(StatusCode::NOT_FOUND)
-            .body(err.to_string()),
+async fn get_shorturl(State(state): State<DataStructure>, Json(payload): Json<OriginalUrl>) -> impl IntoResponse {
+    let url = ShortURL::try_from(payload).unwrap();
+    match state.url_storage(url.clone()).await{
+        Ok(_) => (StatusCode::CREATED, Json(url)).into_response(),
+        Err(err) => (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()).into_response()
     }
 }

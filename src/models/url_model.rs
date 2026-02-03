@@ -1,25 +1,26 @@
 use serde::{Deserialize, Serialize};
-use std::error::Error;
+use std::{convert::TryFrom};
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct ShortURL {
     // user_id: u32,
     // short_url: String,
-    og_url: String,
+    pub og_url: String,
     // created_time: String,
     // expiry_time: String
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct OriginalUrl {
-    og_url: String
+    pub og_url: String
 }
 
-impl ShortURL{
-    fn short_url(&self) -> Result<Self, Box<dyn std::error::Error>>{
+impl TryFrom<OriginalUrl> for ShortURL{
+    type Error = Box<dyn std::error::Error>;
+    fn try_from(item: OriginalUrl) -> Result<Self, Self::Error>{
         
         Ok(Self {
-            og_url: self.og_url.clone()
+            og_url: item.og_url.clone()
         })
     }
 }
