@@ -5,8 +5,8 @@ use chrono::{ Duration, Utc};
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct ShortURL {
-    // short_url: String,
     pub og_url: String,
+    short_url: String,
     created_time: BsonDateTime,
     expiry_time: BsonDateTime
 }
@@ -25,6 +25,7 @@ impl TryFrom<OriginalUrl> for ShortURL{
         
         Ok(Self {
             og_url: item.og_url.clone(),
+            short_url: item.og_url.clone(),
             created_time : BsonDateTime::from_millis(now.timestamp_millis()),
             expiry_time: BsonDateTime::from_millis(expires_at.timestamp_millis())
         })
