@@ -932,6 +932,7 @@ dependencies = [
  "chrono",
  "dotenv",
  "mongodb",
+ "rand",
  "serde",
  "tokio",
  "uuid",

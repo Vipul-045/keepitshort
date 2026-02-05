@@ -2,11 +2,13 @@ use mongodb::bson::{ DateTime as BsonDateTime};
 use serde::{Deserialize, Serialize};
 use std::{convert::TryFrom};
 use chrono::{ Duration, Utc};
+use rand::{Rng, distr::Alphanumeric};
+
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct ShortURL {
     pub og_url: String,
-    short_url: String,
+    pub short_url: String,
     created_time: BsonDateTime,
     expiry_time: BsonDateTime
 }
@@ -21,13 +23,28 @@ impl TryFrom<OriginalUrl> for ShortURL{
     fn try_from(item: OriginalUrl) -> Result<Self, Self::Error>{
         let now = Utc::now();
         let expires_at = now + Duration::seconds(30);
+
+    fn short_it() -> String {
+        let shortcode = generate_four_char(4);
+        let web_url = "www".to_owned();
+        let short_url = web_url + &shortcode;
+        short_url
+    }
         
         
         Ok(Self {
             og_url: item.og_url.clone(),
-            short_url: item.og_url.clone(),
+            short_url: short_it(),
             created_time : BsonDateTime::from_millis(now.timestamp_millis()),
             expiry_time: BsonDateTime::from_millis(expires_at.timestamp_millis())
         })
     }
+}
+
+pub fn generate_four_char(len: usize) -> String {
+    rand::rng()
+    .sample_iter(&Alphanumeric)
+    .take(len)
+    .map(char::from)
+    .collect()
 }
