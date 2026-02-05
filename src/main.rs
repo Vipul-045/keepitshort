@@ -1,4 +1,4 @@
-use axum::extract::{State, path};
+use axum::extract::{State, Path};
 use axum::{
     Json, Router,
     http::StatusCode,
@@ -19,7 +19,7 @@ async fn main() {
     let mongo = DataStructure::new().await.expect("Failed to connect");
     let app = Router::new()
         .route("/url", post(get_shorturl))
-        .route("/{}", get(get_ogurl(path(String)))
+        .route("/{shortcode}", get(get_ogurl))
         .with_state(mongo);
 
     let address = "localhost:6650";
@@ -35,13 +35,23 @@ async fn get_shorturl(
     let url = ShortURL::try_from(payload).unwrap();
     match state.url_storage(url.clone()).await {
         Ok(_) => {
-            let short_url = url.short_url.clone();
+            let short_url = url.short_url;
             (StatusCode::CREATED, Json(short_url)).into_response()
         }
         Err(err) => (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()).into_response(),
     }
 }
 
-async fn get_ogurl(String){
+async fn get_ogurl(State(state): State<DataStructure>, Path(shortcode): Path<String>) -> impl IntoResponse{
+    match state.get_ogurl(&shortcode).await{
+        Ok(Some(record)) => {
+            let og_url = record.og_url;
+            (StatusCode::OK, Json(og_url)).into_response()
+        }
+        Ok(None) => {
+            StatusCode::NOT_FOUND.into_response()
+        }
+        Err(err)=>(StatusCode::INTERNAL_SERVER_ERROR, err.to_string()).into_response(),
+    }
 
 }

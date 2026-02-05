@@ -1,14 +1,14 @@
 use mongodb::{
     Client, Collection, bson::de::Error, options::ClientOptions, results::{DeleteResult, InsertOneResult, UpdateResult}
 };
-use std::env;
+use std::{env, result};
 use mongodb::bson::doc;
 
 use crate::models::url_model::ShortURL;
 
 #[derive(Clone)]
 pub struct DataStructure {
-        og_url : Collection<ShortURL>,
+        pub og_url : Collection<ShortURL>,
 }
 
 impl DataStructure {
@@ -34,6 +34,11 @@ impl DataStructure {
             .await
             .ok()
             .expect("Error inserting a url");
+        Ok(result)
+    }
+
+    pub async fn get_ogurl(&self, short_url: &str) -> Result<Option<ShortURL>, Error>{
+        let result = self.og_url.find_one(doc! {"short_url": short_url }).await.ok().expect("No url found");
         Ok(result)
     }
 }
