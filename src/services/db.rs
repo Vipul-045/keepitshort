@@ -1,7 +1,7 @@
 use mongodb::{
-    Client, Collection, bson::de::Error, options::ClientOptions, results::{DeleteResult, InsertOneResult, UpdateResult}
+    Client, Collection, bson::de::Error, options::ClientOptions, results::{InsertOneResult}
 };
-use std::{env, result};
+use std::{env};
 use mongodb::bson::doc;
 
 use crate::models::url_model::ShortURL;

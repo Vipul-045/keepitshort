@@ -1,4 +1,5 @@
 use axum::extract::{State, Path};
+use axum::http::header;
 use axum::{
     Json, Router,
     http::StatusCode,
@@ -18,7 +19,7 @@ async fn main() {
     dotenv::dotenv().ok();
     let mongo = DataStructure::new().await.expect("Failed to connect");
     let app = Router::new()
-        .route("/url", post(get_shorturl))
+        .route("/", post(get_shorturl))
         .route("/{shortcode}", get(get_ogurl))
         .with_state(mongo);
 
@@ -36,7 +37,8 @@ async fn get_shorturl(
     match state.url_storage(url.clone()).await {
         Ok(_) => {
             let short_url = url.short_url;
-            (StatusCode::CREATED, Json(short_url)).into_response()
+            let full_url = format!("http://localhost:6650/{}", short_url);
+            (StatusCode::CREATED, Json(full_url)).into_response()
         }
         Err(err) => (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()).into_response(),
     }
@@ -46,7 +48,7 @@ async fn get_ogurl(State(state): State<DataStructure>, Path(shortcode): Path<Str
     match state.get_ogurl(&shortcode).await{
         Ok(Some(record)) => {
             let og_url = record.og_url;
-            (StatusCode::OK, Json(og_url)).into_response()
+            (StatusCode::FOUND, [(header::LOCATION, &og_url)]).into_response()
         }
         Ok(None) => {
             StatusCode::NOT_FOUND.into_response()

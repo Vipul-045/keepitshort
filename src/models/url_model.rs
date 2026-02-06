@@ -23,18 +23,11 @@ impl TryFrom<OriginalUrl> for ShortURL{
     fn try_from(item: OriginalUrl) -> Result<Self, Self::Error>{
         let now = Utc::now();
         let expires_at = now + Duration::seconds(30);
-
-    fn short_it() -> String {
-        let shortcode = generate_four_char(4);
-        let web_url = "www".to_owned();
-        let short_url = web_url + &shortcode;
-        short_url
-    }
         
         
         Ok(Self {
             og_url: item.og_url.clone(),
-            short_url: short_it(),
+            short_url: generate_four_char(4),
             created_time : BsonDateTime::from_millis(now.timestamp_millis()),
             expiry_time: BsonDateTime::from_millis(expires_at.timestamp_millis())
         })
