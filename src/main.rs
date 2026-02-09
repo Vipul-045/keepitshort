@@ -23,7 +23,7 @@ async fn main() {
         .route("/{shortcode}", get(get_ogurl))
         .with_state(mongo);
 
-    let address = "localhost:6650";
+    let address = "0.0.0.0:3000";
     let listener = tokio::net::TcpListener::bind(address).await.unwrap();
 
     axum::serve(listener, app).await.unwrap();
@@ -37,7 +37,7 @@ async fn get_shorturl(
     match state.url_storage(url.clone()).await {
         Ok(_) => {
             let short_url = url.short_url;
-            let full_url = format!("http://localhost:6650/{}", short_url);
+            let full_url = format!("https://ks.vipul.live/{}", short_url);
             (StatusCode::CREATED, Json(full_url)).into_response()
         }
         Err(err) => (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()).into_response(),

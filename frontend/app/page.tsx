@@ -1,61 +1,105 @@
-import Image from "next/image";
+'use client';
+
+import { useState } from 'react';
 
 export default function Home() {
+  const [longUrl, setLongUrl] = useState('');
+  const [shortUrl, setShortUrl] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleShorten = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!longUrl) return;
+
+    setIsLoading(true);
+    
+    // Simulate API delay (Replace this block with your actual fetch call)
+    setTimeout(() => {
+      const randomCode = Math.random().toString(36).substring(7);
+      setShortUrl(`http://sho.rt/${randomCode}`);
+      setIsLoading(false);
+    }, 1000);
+  };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(shortUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <div
-          className=" max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50"
-        >Keep It Short</div>
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <input className="bg-white border-indigo-700 " type="text" />
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+    <main className="flex min-h-screen flex-col items-center justify-center bg-black selection:bg-blue-500 selection:text-white relative overflow-hidden">
+    <>  
+    <h2 className='mb-5 text-2xl font-bold items-start justify-start'>Keep It Short</h2>
+      
+      {/* Content Container */}
+      <div className="relative z-10 w-full max-w-lg px-6">
+        
+        {/* Input Section */}
+        <form onSubmit={handleShorten} className="flex flex-col gap-4">
+          <div className="relative group">
+            <div className="absolute -inset-1  from-blue-600 to-purple-600 rounded-lg blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
+            <input
+              type="url"
+              placeholder="Enter long URL here..."
+              value={longUrl}
+              onChange={(e) => setLongUrl(e.target.value)}
+              required
+              className="relative w-full bg-white/5 border border-white/10 text-white placeholder-gray-500 rounded-lg px-6 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all shadow-[0_0_0_1px_rgba(255,255,255,0.1)]"
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+          </div>
+
+          <button
+            type="button"
+            onClick={handleShorten}
+            disabled={isLoading}
+            className="mx-auto flex flex-col items-center justify-center w-1/2 text-white cursor-pointer font-bold py-3 rounded-lg shadow-[0_0_30px_rgba(57,99,235,1)] hover:shadow-[0_0_20px_rgba(37,99,235,0.5)] transform transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
           >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+            {isLoading ? 'Shortening...' : 'Short it'}
+          </button>
+        </form>
+
+        {/* Result Section */}
+        {shortUrl && (
+          <div className="mt-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="p-1 rounded-xl bg-gradient-to-r from-white/10 to-transparent">
+              <div className="bg-black/80 backdrop-blur-md border border-white/10 rounded-lg p-4 flex items-center justify-between gap-4">
+                
+                <span className="text-blue-400 font-mono text-lg truncate selection:bg-white/20">
+                  {shortUrl}
+                </span>
+
+                <button
+                  onClick={handleCopy}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium transition-all ${
+                    copied 
+                      ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30' 
+                      : 'bg-blue-600 text-white hover:bg-blue-500'
+                  }`}
+                >
+                  {copied ? (
+                    <>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      Copied
+                    </>
+                  ) : (
+                    <>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                      Copy
+                    </>
+                  )}
+                </button>
+                
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+        </>
+      <div className="absolute bottom-6 left-0 right-0 text-center text-white/50 text-sm font-light">
+  built by <a href="https://vipul.live" className='underline'>Vipul</a>
+</div>
+    </main>
   );
 }
