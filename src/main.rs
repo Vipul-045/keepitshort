@@ -2,10 +2,11 @@ use axum::extract::{State, Path};
 use axum::http::header;
 use axum::{
     Json, Router,
-    http::StatusCode,
+    http::{StatusCode, Method, HeaderValue},
     response::IntoResponse,
     routing::{get, post},
 };
+use tower_http::cors::{CorsLayer, Any};
 
 use crate::models::url_model::{OriginalUrl, ShortURL};
 use crate::services::db::DataStructure;
@@ -14,16 +15,21 @@ use crate::services::db::DataStructure;
 mod models;
 mod services;
 
+
 #[tokio::main]
 async fn main() {
     dotenv::dotenv().ok();
+    let cors = CorsLayer::new()
+    .allow_origin(HeaderValue::from_static("http://localhost:3000"))
+    .allow_methods([Method::GET, Method::POST, Method::OPTIONS])
+    .allow_headers(Any);
     let mongo = DataStructure::new().await.expect("Failed to connect");
     let app = Router::new()
         .route("/", post(get_shorturl))
-        .route("/{shortcode}", get(get_ogurl))
+        .route("/{shortcode}", get(get_ogurl)).layer(cors)
         .with_state(mongo);
 
-    let address = "0.0.0.0:3000";
+    let address = "0.0.0.0:3001";
     let listener = tokio::net::TcpListener::bind(address).await.unwrap();
 
     axum::serve(listener, app).await.unwrap();
@@ -37,7 +43,7 @@ async fn get_shorturl(
     match state.url_storage(url.clone()).await {
         Ok(_) => {
             let short_url = url.short_url;
-            let full_url = format!("https://ks.vipul.live/{}", short_url);
+            let full_url = format!("ks.vipul.live/{}", short_url);
             (StatusCode::CREATED, Json(full_url)).into_response()
         }
         Err(err) => (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()).into_response(),

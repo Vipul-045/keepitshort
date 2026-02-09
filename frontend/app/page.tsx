@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { short_url } from './api';
 
 export default function Home() {
   const [longUrl, setLongUrl] = useState('');
@@ -14,12 +15,9 @@ export default function Home() {
 
     setIsLoading(true);
     
-    // Simulate API delay (Replace this block with your actual fetch call)
-    setTimeout(() => {
-      const randomCode = Math.random().toString(36).substring(7);
-      setShortUrl(`http://sho.rt/${randomCode}`);
-      setIsLoading(false);
-    }, 1000);
+    const data = await short_url(longUrl)
+    setShortUrl(data)
+    setIsLoading(false);
   };
 
   const handleCopy = () => {
