@@ -1,4 +1,4 @@
-const BACKEND = "http://localhost:3001" ; 
+const BACKEND = "https://keepitshort-46ze.onrender.com" ; 
 
 export async function short_url(og_url: string) {
     const res = await fetch(`${BACKEND}/`,
