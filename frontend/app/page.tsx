@@ -93,6 +93,8 @@ export default function Home() {
             </div>
           </div>
         )}
+
+        {}
       </div>
         </>
       <div className="absolute bottom-6 left-0 right-0 text-center text-white/50 text-sm font-light">

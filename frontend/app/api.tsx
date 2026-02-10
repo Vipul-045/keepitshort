@@ -1,6 +1,6 @@
 const BACKEND = "http://localhost:3001" ; 
 
-export async function short_url(og_url: String) {
+export async function short_url(og_url: string) {
     const res = await fetch(`${BACKEND}/`,
         {
             method : "POST",
@@ -15,4 +15,14 @@ export async function short_url(og_url: String) {
     }
 
     return data;
+}
+
+export async function get_url(code: string) {
+    const res = await fetch(`${BACKEND}/${code}`,
+        {
+            method: "GET",
+            headers : {"Content-Type": "application/json"},
+        }
+    )
+    return res.json();
 }
