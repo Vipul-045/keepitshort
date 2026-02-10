@@ -20,7 +20,7 @@ mod services;
 async fn main() {
     dotenv::dotenv().ok();
     let cors = CorsLayer::new()
-    .allow_origin(HeaderValue::from_static("http://localhost:3000"))
+    .allow_origin(HeaderValue::from_static("https://ks.vipul.live/"))
     .allow_methods([Method::GET, Method::POST, Method::OPTIONS])
     .allow_headers(Any);
     let mongo = DataStructure::new().await.expect("Failed to connect");
@@ -29,7 +29,7 @@ async fn main() {
         .route("/{shortcode}", get(get_ogurl)).layer(cors)
         .with_state(mongo);
 
-    let address = "0.0.0.0:3001";
+    let address = "ks.vipul.live";
     let listener = tokio::net::TcpListener::bind(address).await.unwrap();
 
     axum::serve(listener, app).await.unwrap();
