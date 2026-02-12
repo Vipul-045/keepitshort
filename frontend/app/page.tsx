@@ -61,7 +61,7 @@ export default function Home() {
         {/* Result Section */}
         {shortUrl && (
           <div className="mt-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="p-1 rounded-xl bg-gradient-to-r from-white/10 to-transparent">
+            <div className="p-1 rounded-xl from-white/10 to-transparent">
               <div className="bg-black/80 backdrop-blur-md border border-white/10 rounded-lg p-4 flex items-center justify-between gap-4">
                 
                 <span className="text-blue-400 font-mono text-lg truncate selection:bg-white/20">
