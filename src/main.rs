@@ -29,7 +29,7 @@ async fn main() {
         .route("/{shortcode}", get(get_ogurl)).layer(cors)
         .with_state(mongo);
 
-    let address = "0.0.0.0:0";
+    let address = "0.0.0.0:3001";
     let listener = tokio::net::TcpListener::bind(address).await.unwrap();
 
     axum::serve(listener, app).await.unwrap();
