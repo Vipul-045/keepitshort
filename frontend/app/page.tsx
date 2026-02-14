@@ -27,9 +27,9 @@ export default function Home() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-black selection:bg-blue-500 selection:text-white relative overflow-hidden">
+    <main className="flex min-h-screen flex-col items-center justify-center bg-black selection:bg-blue-500 selection:text-white relative overflow-hidden pt-0 pb-80">
     <>  
-    <h2 className='mb-5 text-2xl font-bold items-start justify-start text-white'>Keep It Short</h2>
+    <h2 className='mb-8 text-2xl font-bold items-start justify-start text-white'>Keep It Short</h2>
       
       {/* Content Container */}
       <div className="relative z-10 w-full max-w-lg px-6">
