@@ -43,7 +43,7 @@ async fn get_shorturl(
     match state.url_storage(url.clone()).await {
         Ok(_) => {
             let short_url = url.short_url;
-            let full_url = format!("https://ks.vipul.live/{}", short_url);
+            let full_url = format!("ks.vipul.live/{}", short_url);
             (StatusCode::CREATED, Json(full_url)).into_response()
         }
         Err(err) => (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()).into_response(),
