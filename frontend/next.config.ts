@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
   return [
     {
       source: '/:shortcode',
-      destination: 'https://keepitshort.onrender.com/:shortcode',
+      destination: 'https://keepitshort-46ze.onrender.com/:shortcode',
     },
   ];
 }
