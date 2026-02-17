@@ -1,1 +1,1 @@
-**A url shortner building in rust**
+**A url shortner built in rust**
